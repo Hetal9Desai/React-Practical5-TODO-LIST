@@ -1,11 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./TodoApp.css";
-import { FaEdit, FaTrashAlt, FaCheckCircle } from "react-icons/fa";
+import { FaTrashAlt } from "react-icons/fa";
 import { Todo } from "./Types";
 
-const TodoAppUI: React.FC = () => {
+const STORAGE_KEY = "todosData";
+
+const TodoApp: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [input, setInput] = useState("");
+
+  useEffect(() => {
+    const storedTodos = localStorage.getItem(STORAGE_KEY);
+    if (storedTodos) {
+      setTodos(JSON.parse(storedTodos).todos);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (todos.length > 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ todos }));
+    }
+  }, [todos]);
 
   const handleAdd = () => {
     if (input.trim() === "") return;
@@ -18,8 +33,19 @@ const TodoAppUI: React.FC = () => {
     };
 
     setTodos([newTodo, ...todos]);
-
     setInput("");
+  };
+
+  const handleToggle = (id: number) => {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
+  };
+
+  const handleDelete = (id: number) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
   };
 
   return (
@@ -42,42 +68,30 @@ const TodoAppUI: React.FC = () => {
       </div>
 
       <div className="todo-list">
-        {/* Example Todo Item */}
-        <div className="todo-item">
-          <input type="checkbox" />
-          <div className="todo-text">
-            <span className="text">Sample Todo Item</span>
-            <span className="date">2025-05-01 10:00 AM</span>
+        {todos.map((todo) => (
+          <div
+            key={todo.id}
+            className={`todo-item ${todo.completed ? "completed" : ""}`}
+          >
+            <input
+              type="checkbox"
+              checked={todo.completed}
+              onChange={() => handleToggle(todo.id)}
+            />
+            <div className="todo-text">
+              <span className="text">{todo.text}</span>
+              <span className="date">{todo.date}</span>
+            </div>
+            <div className="todo-actions">
+              <button onClick={() => handleDelete(todo.id)}>
+                <FaTrashAlt />
+              </button>
+            </div>
           </div>
-          <div className="todo-actions">
-            <button>
-              <FaEdit />
-            </button>
-            <button>
-              <FaTrashAlt />
-            </button>
-          </div>
-        </div>
-
-        {/* Completed Todo Item */}
-        <div className="todo-item completed">
-          <input type="checkbox" checked readOnly />
-          <div className="todo-text">
-            <span className="text">Completed Task Example</span>
-            <span className="date">2025-04-30 3:15 PM</span>
-          </div>
-          <div className="todo-actions">
-            <button>
-              <FaCheckCircle />
-            </button>
-            <button>
-              <FaTrashAlt />
-            </button>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );
 };
 
-export default TodoAppUI;
+export default TodoApp;
