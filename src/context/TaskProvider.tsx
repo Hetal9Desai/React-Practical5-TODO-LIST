@@ -1,6 +1,6 @@
 import { useState, useEffect, ReactNode } from "react";
 import { TaskContext } from "./TaskContext";
-import { Task } from "../types/Task";
+import { Task, TaskStatus } from "../types/Task";
 
 interface TaskProviderProps {
   children: ReactNode;
@@ -25,8 +25,42 @@ export const TaskProvider = ({ children }: TaskProviderProps) => {
     );
   };
 
+  const deleteTask = (id: string) => {
+    setTasks((prev) => prev.filter((task) => task.id !== id));
+  };
+
+  const filterTasks = (
+    title: string,
+    description: string,
+    both: string,
+    status: string
+  ) => {
+    return tasks.filter((task) => {
+      const titleMatch = title
+        ? task.title.toLowerCase().includes(title.toLowerCase())
+        : true;
+
+      const descMatch = description
+        ? task.desc.toLowerCase().includes(description.toLowerCase())
+        : true;
+
+      const bothMatch = both
+        ? task.title.toLowerCase().includes(both.toLowerCase()) ||
+          task.desc.toLowerCase().includes(both.toLowerCase())
+        : true;
+
+      const statusMatch = status
+        ? task.status === (status as TaskStatus)
+        : true;
+
+      return titleMatch && descMatch && bothMatch && statusMatch;
+    });
+  };
+
   return (
-    <TaskContext.Provider value={{ tasks, addTask, updateTask }}>
+    <TaskContext.Provider
+      value={{ tasks, addTask, updateTask, deleteTask, filterTasks }}
+    >
       {children}
     </TaskContext.Provider>
   );
