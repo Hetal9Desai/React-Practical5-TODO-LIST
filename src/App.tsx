@@ -2,11 +2,11 @@ import {
   BrowserRouter as BrowserRouter,
   Route,
   Routes,
-} from "react-router-dom";
-import { TaskProvider } from "./context/TaskProvider";
-import Navbar from "./components/Navbar";
-import AddEditTask from "./pages/AddEditTask";
-import TaskList from "./pages/TskList";
+} from 'react-router-dom';
+import { TaskProvider } from './context/TaskProvider';
+import Navbar from './components/Navbar';
+import AddEditTask from './pages/AddEditTask';
+import TaskList from './pages/TskList';
 
 const App = () => {
   return (

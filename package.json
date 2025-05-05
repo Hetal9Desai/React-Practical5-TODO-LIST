@@ -1,5 +1,5 @@
 {
-  "name": "task-manager",
+  "name": "react-practical5-todo-list",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "format": "prettier --write ."
+    "format": "prettier --write \"src/**/*.{js,jsx.ts,tsx,json,css,scss,md}\""
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -40,7 +40,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
-    "prettier": "^3.5.3",
+    "prettier": "3.5.3",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.31.1",
     "vite": "^6.3.1"

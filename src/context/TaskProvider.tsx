@@ -1,6 +1,6 @@
-import { useState, useEffect, ReactNode } from "react";
-import { TaskContext } from "./TaskContext";
-import { Task, TaskStatus } from "../types/Task";
+import { useState, useEffect, ReactNode } from 'react';
+import { TaskContext } from './TaskContext';
+import { Task, TaskStatus } from '../types/Task';
 
 interface TaskProviderProps {
   children: ReactNode;
@@ -8,11 +8,11 @@ interface TaskProviderProps {
 
 export const TaskProvider = ({ children }: TaskProviderProps) => {
   const [tasks, setTasks] = useState<Task[]>(
-    JSON.parse(localStorage.getItem("tasks") || "[]")
+    JSON.parse(localStorage.getItem('tasks') || '[]'),
   );
 
   useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+    localStorage.setItem('tasks', JSON.stringify(tasks));
   }, [tasks]);
 
   const addTask = (task: Task) => {
@@ -21,7 +21,7 @@ export const TaskProvider = ({ children }: TaskProviderProps) => {
 
   const updateTask = (updatedTask: Task) => {
     setTasks((prev) =>
-      prev.map((task) => (task.id === updatedTask.id ? updatedTask : task))
+      prev.map((task) => (task.id === updatedTask.id ? updatedTask : task)),
     );
   };
 
@@ -33,7 +33,7 @@ export const TaskProvider = ({ children }: TaskProviderProps) => {
     title: string,
     description: string,
     both: string,
-    status: string
+    status: string,
   ) => {
     return tasks.filter((task) => {
       const titleMatch = title

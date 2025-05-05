@@ -1,21 +1,21 @@
-import React, { useState, useMemo } from "react";
-import { useTaskContext } from "../hooks/useTaskContext";
-import { Task } from "../types/Task";
-import { Link } from "react-router-dom";
+import React, { useState, useMemo } from 'react';
+import { useTaskContext } from '../hooks/useTaskContext';
+import { Task } from '../types/Task';
+import { Link } from 'react-router-dom';
 
 const TaskList = () => {
   const { deleteTask, filterTasks } = useTaskContext();
 
   const [filters, setFilters] = useState({
-    title: "",
-    desc: "",
-    both: "",
-    status: "",
+    title: '',
+    desc: '',
+    both: '',
+    status: '',
   });
 
   const handleFilterChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-    filterType: string
+    filterType: string,
   ) => {
     setFilters((prev) => ({ ...prev, [filterType]: e.target.value }));
   };
@@ -29,20 +29,20 @@ const TaskList = () => {
     if (filters.status) filtersApplied.push(`Status: ${filters.status}`);
 
     return filtersApplied.length
-      ? `No tasks found based on ${filtersApplied.join(" & ")}`
-      : "";
+      ? `No tasks found based on ${filtersApplied.join(' & ')}`
+      : '';
   };
 
   const getStatusClass = (status: string) => {
     switch (status) {
-      case "todo":
-        return "bg-danger bg-opacity-25 border border-danger";
-      case "inprogress":
-        return "bg-warning bg-opacity-25 border border-warning";
-      case "done":
-        return "bg-success bg-opacity-25 border border-success";
+      case 'todo':
+        return 'bg-danger bg-opacity-25 border border-danger';
+      case 'inprogress':
+        return 'bg-warning bg-opacity-25 border border-warning';
+      case 'done':
+        return 'bg-success bg-opacity-25 border border-success';
       default:
-        return "";
+        return '';
     }
   };
 
@@ -52,7 +52,7 @@ const TaskList = () => {
       filters.title,
       filters.desc,
       filters.both,
-      filters.status
+      filters.status,
     );
   }, [filters, filterTasks]);
 
@@ -96,7 +96,7 @@ const TaskList = () => {
                 className="form-control"
                 placeholder="Filter by Title"
                 value={filters.title}
-                onChange={(e) => handleFilterChange(e, "title")}
+                onChange={(e) => handleFilterChange(e, 'title')}
               />
             </div>
             <div className="col-md-3">
@@ -105,7 +105,7 @@ const TaskList = () => {
                 className="form-control"
                 placeholder="Filter by Description"
                 value={filters.desc}
-                onChange={(e) => handleFilterChange(e, "desc")}
+                onChange={(e) => handleFilterChange(e, 'desc')}
               />
             </div>
             <div className="col-md-3">
@@ -114,14 +114,14 @@ const TaskList = () => {
                 className="form-control"
                 placeholder="Filter by Title / Description"
                 value={filters.both}
-                onChange={(e) => handleFilterChange(e, "both")}
+                onChange={(e) => handleFilterChange(e, 'both')}
               />
             </div>
             <div className="col-md-3">
               <select
                 className="form-select"
                 value={filters.status}
-                onChange={(e) => handleFilterChange(e, "status")}
+                onChange={(e) => handleFilterChange(e, 'status')}
               >
                 <option value="">All Status</option>
                 <option value="todo">To Do</option>
@@ -136,7 +136,7 @@ const TaskList = () => {
       {/* Task List */}
       {filteredTasks.length === 0 ? (
         <div className="alert alert-info" role="alert">
-          {getFilterMessage() || "No tasks found."}
+          {getFilterMessage() || 'No tasks found.'}
         </div>
       ) : (
         <div className="card shadow-sm">
@@ -154,11 +154,11 @@ const TaskList = () => {
                       {/* Status badge shown after description */}
                       <div
                         className={`badge ${
-                          task.status === "todo"
-                            ? "bg-danger bg-opacity-50"
-                            : task.status === "inprogress"
-                            ? "bg-warning bg-opacity-50"
-                            : "bg-success bg-opacity-50"
+                          task.status === 'todo'
+                            ? 'bg-danger bg-opacity-50'
+                            : task.status === 'inprogress'
+                              ? 'bg-warning bg-opacity-50'
+                              : 'bg-success bg-opacity-50'
                         }`}
                       >
                         {task.status.charAt(0).toUpperCase() +
