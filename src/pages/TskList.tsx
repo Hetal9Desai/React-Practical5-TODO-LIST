@@ -46,7 +46,6 @@ const TaskList = () => {
     }
   };
 
-  // Memoizing filtered tasks to avoid unnecessary re-renders
   const filteredTasks: Task[] = useMemo(() => {
     return filterTasks(
       filters.title,
@@ -60,7 +59,6 @@ const TaskList = () => {
     <div className="container mt-5">
       <h2 className="mb-4 text-center">Task List</h2>
 
-      {/* Legend */}
       <div className="card p-3 mb-4 shadow-lg">
         <h5 className="mb-3">Legend</h5>
         <div className="d-flex align-items-center gap-4">
@@ -85,7 +83,6 @@ const TaskList = () => {
         </div>
       </div>
 
-      {/* Filter Section */}
       <div className="card mb-4 shadow-sm">
         <div className="card-body">
           <h5 className="card-title">Filter Tasks</h5>
@@ -133,7 +130,6 @@ const TaskList = () => {
         </div>
       </div>
 
-      {/* Task List */}
       {filteredTasks.length === 0 ? (
         <div className="alert alert-info" role="alert">
           {getFilterMessage() || 'No tasks found.'}
@@ -151,7 +147,6 @@ const TaskList = () => {
                       <h5 className="card-title">{task.title}</h5>
                       <p className="card-text">{task.desc}</p>
 
-                      {/* Status badge shown after description */}
                       <div
                         className={`badge ${
                           task.status === 'todo'
