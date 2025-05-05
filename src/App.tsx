@@ -1,7 +1,13 @@
-import TodoApp from "../src/components/Todoapp";
+import { BrowserRouter as BrowserRouter } from "react-router-dom";
 
-function App() {
-  return <TodoApp />;
-}
+import Navbar from "./components/Navbar";
+
+const App = () => {
+  return (
+    <BrowserRouter>
+      <Navbar />
+    </BrowserRouter>
+  );
+};
 
 export default App;
