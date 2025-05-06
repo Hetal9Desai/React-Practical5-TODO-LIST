@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { useTaskContext } from '../hooks/useTaskContext';
 import { Task, TaskStatus } from '../types/Task';
 import { Link } from 'react-router-dom';
+import TaskLegend from '../components/TaskLegend';
+import TaskFilter from '../components/TaskFilter';
 
 const TaskList: React.FC = () => {
   const { deleteTask, filterTasks, updateTask } = useTaskContext();
@@ -53,78 +55,11 @@ const TaskList: React.FC = () => {
   return (
     <div className="container mt-5">
       <h2 className="mb-4 text-center">Task List</h2>
-
-      <div className="card p-3 mb-4 shadow-lg">
-        <h5 className="mb-3">Legend</h5>
-        <div className="d-flex align-items-center gap-4">
-          <div className="d-flex align-items-center">
-            <span className="badge bg-danger bg-opacity-25 border border-danger me-2">
-              &nbsp;&nbsp;&nbsp;&nbsp;
-            </span>
-            To Do
-          </div>
-          <div className="d-flex align-items-center">
-            <span className="badge bg-warning bg-opacity-25 border border-warning text-dark me-2">
-              &nbsp;&nbsp;&nbsp;&nbsp;
-            </span>
-            In Progress
-          </div>
-          <div className="d-flex align-items-center">
-            <span className="badge bg-success bg-opacity-25 border border-success me-2">
-              &nbsp;&nbsp;&nbsp;&nbsp;
-            </span>
-            Done
-          </div>
-        </div>
-      </div>
-
-      <div className="card mb-4 shadow-sm">
-        <div className="card-body">
-          <h5 className="card-title">Filter Tasks</h5>
-          <div className="row mb-4">
-            <div className="col-md-3">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Filter by Title"
-                value={filters.title}
-                onChange={(e) => handleFilterChange(e, 'title')}
-              />
-            </div>
-            <div className="col-md-3">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Filter by Description"
-                value={filters.desc}
-                onChange={(e) => handleFilterChange(e, 'desc')}
-              />
-            </div>
-            <div className="col-md-3">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Filter by Title / Description"
-                value={filters.both}
-                onChange={(e) => handleFilterChange(e, 'both')}
-              />
-            </div>
-            <div className="col-md-3">
-              <select
-                className="form-select"
-                value={filters.status}
-                onChange={(e) => handleFilterChange(e, 'status')}
-              >
-                <option value="">All Status</option>
-                <option value={TaskStatus.TODO}>To Do</option>
-                <option value={TaskStatus.IN_PROGRESS}>In Progress</option>
-                <option value={TaskStatus.DONE}>Done</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
+      <TaskLegend />
+      <TaskFilter
+        filters={filters}
+        handleFilterChange={handleFilterChange}
+      />{' '}
       {filteredTasks.length === 0 ? (
         <div className="alert alert-info" role="alert">
           {getFilterMessage() || 'No tasks found.'}
