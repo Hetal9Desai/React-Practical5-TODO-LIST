@@ -8,9 +8,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 
 const taskSchema = z.object({
-  title: z.string().min(3, 'Title is required'),
-  desc: z.string().min(10, 'Description is required'),
-  status: z.enum([TaskStatus.TODO, TaskStatus.IN_PROGRESS, TaskStatus.DONE]),
+  title: z
+    .string()
+    .min(3, { message: 'Title must be at least 3 characters long' }),
+  desc: z
+    .string()
+    .min(10, { message: 'Description must be at least 10 characters long' }),
+  status: z.enum([TaskStatus.TODO, TaskStatus.IN_PROGRESS, TaskStatus.DONE], {
+    errorMap: () => ({ message: 'Please select a valid status' }),
+  }),
 });
 
 type TaskFormData = z.infer<typeof taskSchema>;
@@ -26,44 +32,45 @@ const AddEditTask = () => {
     handleSubmit,
     formState: { errors },
     setValue,
+    reset,
   } = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
+    defaultValues: {
+      title: '',
+      desc: '',
+      status: TaskStatus.TODO,
+    },
   });
 
   useEffect(() => {
     if (id) {
-      const task = tasks.find((task: Task) => task.id === id);
+      const task = tasks.find((t) => t.id === id);
       if (task) {
         setTaskId(task.id);
-
         setValue('title', task.title);
         setValue('desc', task.desc);
         setValue('status', task.status);
       }
+    } else {
+      setTaskId(null);
+      reset();
     }
-  }, [id, tasks, setValue]);
+  }, [id, tasks, setValue, reset]);
 
   const onSubmit = (data: TaskFormData) => {
-    const task: Task = {
-      id: taskId || uuidv4(),
-      ...data,
-    };
-
-    if (taskId) {
-      updateTask(task);
-    } else {
-      addTask(task);
-    }
-
+    const task: Task = { id: taskId || uuidv4(), ...data };
+    taskId ? updateTask(task) : addTask(task);
     navigate('/');
   };
+
+  const handleCancel = () => navigate('/');
 
   return (
     <div className="container mt-5">
       <div className="card shadow-sm">
         <div className="card-body">
           <h2 className="card-title mb-4 text-center">
-            {taskId ? 'Edit Task' : 'Add Task'}
+            {taskId ? 'Update Task' : 'Add Task'}
           </h2>
           <form onSubmit={handleSubmit(onSubmit)} className="row g-3">
             <div className="col-12">
@@ -109,7 +116,16 @@ const AddEditTask = () => {
               )}
             </div>
 
-            <div className="col-12">
+            <div className="col-6">
+              <button
+                type="button"
+                className="btn btn-secondary w-100"
+                onClick={handleCancel}
+              >
+                Cancel
+              </button>
+            </div>
+            <div className="col-6">
               <button className="btn btn-primary w-100" type="submit">
                 {taskId ? 'Update Task' : 'Add Task'}
               </button>
