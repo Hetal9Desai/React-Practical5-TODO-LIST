@@ -172,7 +172,15 @@ const TaskList: React.FC = () => {
                         </Link>
                         <button
                           className="btn btn-danger btn-sm"
-                          onClick={() => deleteTask(task.id)}
+                          onClick={() => {
+                            if (
+                              window.confirm(
+                                `Are you sure you want to delete the task "${task.title}"?`,
+                              )
+                            ) {
+                              deleteTask(task.id);
+                            }
+                          }}
                           aria-label={`Delete task ${task.title}`}
                         >
                           Delete
