@@ -41,7 +41,7 @@ const AddEditTask: React.FC = () => {
     } else {
       reset({ title: '', desc: '', status: TaskStatus.TODO });
     }
-  }, [tasks]);
+  }, [id, tasks, reset, setValue]);
 
   const onSubmit = (data: TaskFormData) => {
     if (id) {
