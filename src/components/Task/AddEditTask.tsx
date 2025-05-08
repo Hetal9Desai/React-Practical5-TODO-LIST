@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useTaskContext } from './TaskProvider';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Task, TaskStatus } from '../../types/Task/types';
@@ -16,10 +16,8 @@ type TaskFormData = z.infer<typeof taskSchema>;
 
 const AddEditTask: React.FC = () => {
   const { tasks, setTasks } = useTaskContext();
-  const [taskId, setTaskId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const isEditMode = Boolean(id);
 
   const {
     register,
@@ -36,21 +34,19 @@ const AddEditTask: React.FC = () => {
     if (id) {
       const task = tasks.find((task) => task.id === id);
       if (task) {
-        setTaskId(task.id);
         setValue('title', task.title);
         setValue('desc', task.desc);
         setValue('status', task.status);
       }
     } else {
-      setTaskId(null);
       reset({ title: '', desc: '', status: TaskStatus.TODO });
     }
-  }, [id, tasks]);
+  }, [tasks]);
 
   const onSubmit = (data: TaskFormData) => {
-    if (isEditMode && taskId) {
+    if (id) {
       setTasks((prev) =>
-        prev.map((task) => (task.id === taskId ? { ...task, ...data } : task)),
+        prev.map((task) => (task.id === id ? { ...task, ...data } : task)),
       );
     } else {
       const newTask: Task = { id: uuidv4(), ...data };
@@ -65,7 +61,7 @@ const AddEditTask: React.FC = () => {
       <div className="card shadow-sm">
         <div className="card-body">
           <h2 className="card-title mb-4 text-center">
-            {isEditMode ? 'Update Task' : 'Add Task'}
+            {id ? 'Update Task' : 'Add Task'}
           </h2>
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -99,10 +95,10 @@ const AddEditTask: React.FC = () => {
             <div className="col-12">
               <select className="form-select" {...register('status')}>
                 <option value={TaskStatus.TODO}>To Do</option>
-                <option value={TaskStatus.IN_PROGRESS} disabled={!isEditMode}>
+                <option value={TaskStatus.IN_PROGRESS} disabled={!id}>
                   In Progress
                 </option>
-                <option value={TaskStatus.DONE} disabled={!isEditMode}>
+                <option value={TaskStatus.DONE} disabled={!id}>
                   Done
                 </option>
               </select>
@@ -119,7 +115,7 @@ const AddEditTask: React.FC = () => {
             </div>
             <div className="col-6">
               <button type="submit" className="btn btn-primary w-100">
-                {isEditMode ? 'Update Task' : 'Add Task'}
+                {id ? 'Update Task' : 'Add Task'}
               </button>
             </div>
           </form>
