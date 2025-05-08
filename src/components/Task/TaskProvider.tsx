@@ -6,8 +6,8 @@ import React, {
   ReactNode,
   Dispatch,
   SetStateAction,
-} from "react";
-import { Task } from "../../types/Task/types";
+} from 'react';
+import { Task } from '../../types/Task/types';
 
 export interface TaskContextType {
   tasks: Task[];
@@ -15,7 +15,7 @@ export interface TaskContextType {
 }
 
 export const TaskContext = createContext<TaskContextType | undefined>(
-  undefined
+  undefined,
 );
 
 interface TaskProviderProps {
@@ -24,12 +24,12 @@ interface TaskProviderProps {
 
 export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
   const [tasks, setTasks] = useState<Task[]>(() => {
-    const stored = localStorage.getItem("tasks");
+    const stored = localStorage.getItem('tasks');
     return stored ? (JSON.parse(stored) as Task[]) : [];
   });
 
   useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+    localStorage.setItem('tasks', JSON.stringify(tasks));
   }, [tasks]);
 
   return (
@@ -42,7 +42,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
 export const useTaskContext = (): TaskContextType => {
   const ctx = useContext(TaskContext);
   if (!ctx) {
-    throw new Error("useTaskContext must be used within a TaskProvider");
+    throw new Error('useTaskContext must be used within a TaskProvider');
   }
   return ctx;
 };
