@@ -1,30 +1,25 @@
-import { useState, useEffect } from 'react';
-import { useTaskContext } from '../hooks/useTaskContext';
+import React, { useEffect, useState } from 'react';
+import { useTaskContext } from './TaskProvider';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Task, TaskStatus } from '../types/Task';
+import { Task, TaskStatus } from '../../types/Task/types';
 import { v4 as uuidv4 } from 'uuid';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 
 const taskSchema = z.object({
-  title: z
-    .string()
-    .min(3, { message: 'Title must be at least 3 characters long' }),
-  desc: z
-    .string()
-    .min(10, { message: 'Description must be at least 10 characters long' }),
+  title: z.string().min(3),
+  desc: z.string().min(10),
   status: z.enum([TaskStatus.TODO, TaskStatus.IN_PROGRESS, TaskStatus.DONE]),
 });
-
 type TaskFormData = z.infer<typeof taskSchema>;
 
-const AddEditTask = () => {
+const AddEditTask: React.FC = () => {
+  const { tasks, setTasks } = useTaskContext();
   const [taskId, setTaskId] = useState<string | null>(null);
-  const { tasks, addTask, updateTask } = useTaskContext();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const isEditMode = Boolean(taskId);
+  const isEditMode = Boolean(id);
 
   const {
     register,
@@ -34,41 +29,36 @@ const AddEditTask = () => {
     reset,
   } = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
-    defaultValues: {
-      title: '',
-      desc: '',
-      status: TaskStatus.TODO,
-    },
+    defaultValues: { title: '', desc: '', status: TaskStatus.TODO },
   });
 
   useEffect(() => {
     if (id) {
-      const task = tasks.find((t) => t.id === id);
+      const task = tasks.find((task) => task.id === id);
       if (task) {
         setTaskId(task.id);
         setValue('title', task.title);
         setValue('desc', task.desc);
         setValue('status', task.status);
-      } else {
-        console.warn(`Task with ID "${id}" not found.`);
       }
     } else {
       setTaskId(null);
-      reset({
-        title: '',
-        desc: '',
-        status: TaskStatus.TODO,
-      });
+      reset({ title: '', desc: '', status: TaskStatus.TODO });
     }
-  }, [id, tasks, setValue, reset]);
+  }, [id, tasks]);
 
   const onSubmit = (data: TaskFormData) => {
-    const task: Task = { id: taskId || uuidv4(), ...data };
-    taskId ? updateTask(task) : addTask(task);
+    if (isEditMode && taskId) {
+      setTasks((prev) =>
+        prev.map((task) => (task.id === taskId ? { ...task, ...data } : task)),
+      );
+    } else {
+      const newTask: Task = { id: uuidv4(), ...data };
+      setTasks((prev) => [...prev, newTask]);
+    }
+
     navigate('/');
   };
-
-  const handleCancel = () => navigate('/');
 
   return (
     <div className="container mt-5">
@@ -77,7 +67,11 @@ const AddEditTask = () => {
           <h2 className="card-title mb-4 text-center">
             {isEditMode ? 'Update Task' : 'Add Task'}
           </h2>
-          <form onSubmit={handleSubmit(onSubmit)} className="row g-3">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="row g-3"
+            noValidate
+          >
             <div className="col-12">
               <input
                 type="text"
@@ -94,8 +88,8 @@ const AddEditTask = () => {
               <textarea
                 className="form-control"
                 placeholder="Description"
-                {...register('desc')}
                 rows={4}
+                {...register('desc')}
               />
               {errors.desc && (
                 <span className="text-danger">{errors.desc.message}</span>
@@ -103,11 +97,7 @@ const AddEditTask = () => {
             </div>
 
             <div className="col-12">
-              <select
-                aria-label="Task Status"
-                className="form-select"
-                {...register('status')}
-              >
+              <select className="form-select" {...register('status')}>
                 <option value={TaskStatus.TODO}>To Do</option>
                 <option value={TaskStatus.IN_PROGRESS} disabled={!isEditMode}>
                   In Progress
@@ -122,13 +112,13 @@ const AddEditTask = () => {
               <button
                 type="button"
                 className="btn btn-secondary w-100"
-                onClick={handleCancel}
+                onClick={() => navigate('/')}
               >
                 Cancel
               </button>
             </div>
             <div className="col-6">
-              <button className="btn btn-primary w-100" type="submit">
+              <button type="submit" className="btn btn-primary w-100">
                 {isEditMode ? 'Update Task' : 'Add Task'}
               </button>
             </div>

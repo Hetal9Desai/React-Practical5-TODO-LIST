@@ -2,17 +2,17 @@ import {
   BrowserRouter as BrowserRouter,
   Route,
   Routes,
-} from 'react-router-dom';
-import { TaskProvider } from './context/TaskProvider';
-import Navbar from './components/Navbar';
-import AddEditTask from './pages/AddEditTask';
-import TaskList from './pages/TskList';
+} from "react-router-dom";
+import { TaskProvider } from "./components/Task/TaskProvider";
+import Navbar from "./components/Navbar/Navbar";
+import AddEditTask from "./components/Task/AddEditTask";
+import TaskList from "./components/Task/TaskList";
 
 const App = () => {
   return (
-    <TaskProvider>
-      <BrowserRouter>
-        <Navbar />
+    <BrowserRouter>
+      <Navbar />
+      <TaskProvider>
         <main className="container mt-4">
           <Routes>
             <Route path="/" element={<TaskList />} />
@@ -20,8 +20,8 @@ const App = () => {
             <Route path="/edit-task/:id" element={<AddEditTask />} />
           </Routes>
         </main>
-      </BrowserRouter>
-    </TaskProvider>
+      </TaskProvider>
+    </BrowserRouter>
   );
 };
 
