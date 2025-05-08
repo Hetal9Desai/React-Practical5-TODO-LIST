@@ -27,5 +27,6 @@ Features
 
     Bootstarp
 
-    ## Deploy Link:
+## Deploy Link:
+
     https://cozy-mandazi-687970.netlify.app/
