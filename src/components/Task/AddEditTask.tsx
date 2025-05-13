@@ -1,58 +1,69 @@
 import React, { useEffect } from 'react';
-import { useTaskContext } from './TaskProvider';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Task, TaskStatus } from '../../types/Task/types';
-import { v4 as uuidv4 } from 'uuid';
 import { useForm } from 'react-hook-form';
+import { v4 as uuidv4 } from 'uuid';
+import { useNavigate, useParams } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { Task, TaskStatus } from '../../types/Task/types';
+import { useTaskContext } from './TaskProvider';
 
 const taskSchema = z.object({
+  id: z.string().uuid().optional(),
   title: z.string().min(3),
   desc: z.string().min(10),
   status: z.enum([TaskStatus.TODO, TaskStatus.IN_PROGRESS, TaskStatus.DONE]),
 });
+
 type TaskFormData = z.infer<typeof taskSchema>;
 
 const AddEditTask: React.FC = () => {
   const { tasks, setTasks } = useTaskContext();
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
+  const { taskId } = useParams<{ taskId: string }>();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
     reset,
   } = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
-    defaultValues: { title: '', desc: '', status: TaskStatus.TODO },
+    defaultValues: {
+      id: undefined,
+      title: '',
+      desc: '',
+      status: TaskStatus.TODO,
+    },
   });
 
   useEffect(() => {
-    if (id) {
-      const task = tasks.find((task) => task.id === id);
-      if (task) {
-        setValue('title', task.title);
-        setValue('desc', task.desc);
-        setValue('status', task.status);
-      }
+    const taskData = tasks?.find((task) => task.id === taskId);
+    if (taskData) {
+      reset({
+        id: taskData.id,
+        title: taskData.title,
+        desc: taskData.desc,
+        status: taskData.status,
+      });
     } else {
-      reset({ title: '', desc: '', status: TaskStatus.TODO });
+      reset({ id: undefined, title: '', desc: '', status: TaskStatus.TODO });
     }
-  }, [id, tasks, reset, setValue]);
+  }, [taskId, tasks, reset]);
 
   const onSubmit = (data: TaskFormData) => {
-    if (id) {
-      setTasks((prev) =>
-        prev.map((task) => (task.id === id ? { ...task, ...data } : task)),
-      );
+    const updatedTasks = tasks ? [...tasks] : [];
+    if (taskId) {
+      const index = updatedTasks.findIndex((task) => task.id === taskId);
+      if (index !== -1) {
+        updatedTasks[index] = { ...updatedTasks[index], ...data };
+      } else {
+        console.error('Task not found');
+      }
     } else {
-      const newTask: Task = { id: uuidv4(), ...data };
-      setTasks((prev) => [...prev, newTask]);
+      const newTask: Task = { ...data, id: uuidv4() };
+      updatedTasks.push(newTask);
     }
-
+    setTasks(updatedTasks);
     navigate('/');
   };
 
@@ -61,13 +72,15 @@ const AddEditTask: React.FC = () => {
       <div className="card shadow-sm">
         <div className="card-body">
           <h2 className="card-title mb-4 text-center">
-            {id ? 'Update Task' : 'Add Task'}
+            {taskId ? 'Update Task' : 'Add Task'}
           </h2>
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="row g-3"
             noValidate
           >
+            <input type="hidden" {...register('id')} />
+
             <div className="col-12">
               <input
                 type="text"
@@ -95,10 +108,10 @@ const AddEditTask: React.FC = () => {
             <div className="col-12">
               <select className="form-select" {...register('status')}>
                 <option value={TaskStatus.TODO}>To Do</option>
-                <option value={TaskStatus.IN_PROGRESS} disabled={!id}>
+                <option value={TaskStatus.IN_PROGRESS} disabled={!taskId}>
                   In Progress
                 </option>
-                <option value={TaskStatus.DONE} disabled={!id}>
+                <option value={TaskStatus.DONE} disabled={!taskId}>
                   Done
                 </option>
               </select>
@@ -115,7 +128,7 @@ const AddEditTask: React.FC = () => {
             </div>
             <div className="col-6">
               <button type="submit" className="btn btn-primary w-100">
-                {id ? 'Update Task' : 'Add Task'}
+                {taskId ? 'Update Task' : 'Add Task'}
               </button>
             </div>
           </form>

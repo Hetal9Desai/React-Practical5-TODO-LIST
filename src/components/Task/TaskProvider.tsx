@@ -10,8 +10,8 @@ import React, {
 import { Task } from '../../types/Task/types';
 
 export interface TaskContextType {
-  tasks: Task[];
-  setTasks: Dispatch<SetStateAction<Task[]>>;
+  tasks: Task[] | undefined;
+  setTasks: Dispatch<SetStateAction<Task[] | undefined>>;
 }
 
 export const TaskContext = createContext<TaskContextType | undefined>(
@@ -23,13 +23,19 @@ interface TaskProviderProps {
 }
 
 export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
-  const [tasks, setTasks] = useState<Task[]>(() => {
-    const stored = localStorage.getItem('tasks');
-    return stored ? (JSON.parse(stored) as Task[]) : [];
-  });
+  const [tasks, setTasks] = useState<Task[] | undefined>(undefined);
 
   useEffect(() => {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
+    const stored = localStorage.getItem('tasks');
+    if (stored) {
+      setTasks(JSON.parse(stored));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (tasks) {
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
   }, [tasks]);
 
   return (

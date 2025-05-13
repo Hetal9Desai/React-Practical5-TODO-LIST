@@ -1,11 +1,14 @@
 import React, { useState, useMemo, ChangeEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { useTaskContext } from './TaskProvider';
 import { Task, TaskStatus } from '../../types/Task/types';
-import { Link } from 'react-router-dom';
 import TaskFilter, { FilterKey } from '../../components/Task/TaskFilter';
+import TaskStatusLegend from './TaskStatusLegend';
 
 const TaskList: React.FC = () => {
   const { tasks, setTasks } = useTaskContext();
+
+  const safeTasks = tasks ?? [];
 
   const [filters, setFilters] = useState<Record<FilterKey, string>>({
     title: '',
@@ -22,7 +25,7 @@ const TaskList: React.FC = () => {
   };
 
   const filteredTasks = useMemo(() => {
-    return tasks.filter((task) => {
+    return safeTasks.filter((task) => {
       const titleMatch = filters.title
         ? task.title.toLowerCase().includes(filters.title.toLowerCase())
         : true;
@@ -38,7 +41,7 @@ const TaskList: React.FC = () => {
         : true;
       return titleMatch && descMatch && bothMatch && statusMatch;
     });
-  }, [tasks, filters]);
+  }, [safeTasks, filters]);
 
   const getStatusClass = (status: TaskStatus) => {
     switch (status) {
@@ -55,49 +58,47 @@ const TaskList: React.FC = () => {
 
   const handleDelete = (id: string, title: string) => {
     if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
-      setTasks((prev) => prev.filter((t) => t.id !== id));
+      setTasks((prev) => (prev ? prev.filter((task) => task.id !== id) : []));
     }
   };
 
-  const handleStatusChange = (task: Task, newStatus: TaskStatus) => {
+  const handleStatusChange = (taskId: string, newStatus: TaskStatus) => {
     setTasks((prev) =>
-      prev.map((t) => (t.id === task.id ? { ...t, status: newStatus } : t)),
+      prev
+        ? prev.map((task) =>
+            task.id === taskId ? { ...task, status: newStatus } : task,
+          )
+        : [],
     );
+  };
+
+  const getNoTasksMessage = () => {
+    if (filters.title && filteredTasks.length === 0) {
+      return `No tasks found for title: "${filters.title}"`;
+    }
+    if (filters.desc && filteredTasks.length === 0) {
+      return `No tasks found for description: "${filters.desc}"`;
+    }
+    if (filters.both && filteredTasks.length === 0) {
+      return `No tasks found for both title and description: "${filters.both}"`;
+    }
+    if (filters.status && filteredTasks.length === 0) {
+      return `No tasks found for status: "${filters.status}"`;
+    }
+    return 'No tasks found.';
   };
 
   return (
     <div className="container mt-5">
       <h2 className="mb-4 text-center">Task List</h2>
 
-      <div className="card p-3 mb-4 shadow-lg">
-        <h5 className="mb-3">Legend</h5>
-        <div className="d-flex align-items-center gap-4">
-          <div className="d-flex align-items-center">
-            <span className="badge bg-danger bg-opacity-25 border border-danger me-2">
-              &nbsp;&nbsp;&nbsp;&nbsp;
-            </span>
-            To Do
-          </div>
-          <div className="d-flex align-items-center">
-            <span className="badge bg-warning bg-opacity-25 border border-warning text-dark me-2">
-              &nbsp;&nbsp;&nbsp;&nbsp;
-            </span>
-            In Progress
-          </div>
-          <div className="d-flex align-items-center">
-            <span className="badge bg-success bg-opacity-25 border border-success me-2">
-              &nbsp;&nbsp;&nbsp;&nbsp;
-            </span>
-            Done
-          </div>
-        </div>
-      </div>
+      <TaskStatusLegend />
 
       <TaskFilter filters={filters} handleFilterChange={handleFilterChange} />
 
       {filteredTasks.length === 0 ? (
         <div className="alert alert-info text-center" role="alert">
-          No tasks found.
+          {getNoTasksMessage()}
         </div>
       ) : (
         <div className="card shadow-sm">
@@ -118,7 +119,7 @@ const TaskList: React.FC = () => {
                           value={task.status}
                           onChange={(e) =>
                             handleStatusChange(
-                              task,
+                              task.id,
                               e.target.value as TaskStatus,
                             )
                           }
