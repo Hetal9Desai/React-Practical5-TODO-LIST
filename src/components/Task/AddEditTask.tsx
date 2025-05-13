@@ -8,7 +8,7 @@ import { Task, TaskStatus } from '../../types/Task/types';
 import { useTaskContext } from './TaskProvider';
 
 const taskSchema = z.object({
-  id: z.string().uuid().optional(),
+  id: z.string().min(1).uuid().optional(), // Ensure id is a valid string, but optional
   title: z.string().min(3),
   desc: z.string().min(10),
   status: z.enum([TaskStatus.TODO, TaskStatus.IN_PROGRESS, TaskStatus.DONE]),
@@ -29,7 +29,7 @@ const AddEditTask: React.FC = () => {
   } = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
-      id: undefined,
+      id: '', // Changed undefined to an empty string
       title: '',
       desc: '',
       status: TaskStatus.TODO,
@@ -46,7 +46,7 @@ const AddEditTask: React.FC = () => {
         status: taskData.status,
       });
     } else {
-      reset({ id: undefined, title: '', desc: '', status: TaskStatus.TODO });
+      reset({ id: '', title: '', desc: '', status: TaskStatus.TODO });
     }
   }, [taskId, tasks, reset]);
 
@@ -60,7 +60,7 @@ const AddEditTask: React.FC = () => {
         console.error('Task not found');
       }
     } else {
-      const newTask: Task = { ...data, id: uuidv4() };
+      const newTask: Task = { ...data, id: uuidv4() }; // Generate a new UUID for new tasks
       updatedTasks.push(newTask);
     }
     setTasks(updatedTasks);

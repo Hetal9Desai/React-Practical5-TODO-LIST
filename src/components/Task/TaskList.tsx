@@ -57,7 +57,7 @@ const TaskList: React.FC = () => {
   };
 
   const handleDelete = (id: string, title: string) => {
-    if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
+    if (confirm(`Are you sure you want to delete "${title}"?`)) {
       setTasks((prev) => (prev ? prev.filter((task) => task.id !== id) : []));
     }
   };
