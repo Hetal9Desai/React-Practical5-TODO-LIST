@@ -8,12 +8,11 @@ import { Task, TaskStatus } from '../../types/Task/types';
 import { useTaskContext } from './TaskProvider';
 
 const taskSchema = z.object({
-  id: z.string().min(1).uuid().optional(),
-  title: z.string().min(3),
-  desc: z.string().min(10),
+  id: z.string().uuid().optional().or(z.literal('')),
+  title: z.string().min(3, 'Title must be at least 3 characters'),
+  desc: z.string().min(10, 'Description must be at least 10 characters'),
   status: z.enum([TaskStatus.TODO, TaskStatus.IN_PROGRESS, TaskStatus.DONE]),
 });
-
 type TaskFormData = z.infer<typeof taskSchema>;
 
 const AddEditTask: React.FC = () => {
@@ -39,31 +38,27 @@ const AddEditTask: React.FC = () => {
   useEffect(() => {
     const taskData = tasks?.find((task) => task.id === taskId);
     if (taskData) {
-      reset({
-        id: taskData.id,
-        title: taskData.title,
-        desc: taskData.desc,
-        status: taskData.status,
-      });
+      reset({ ...taskData });
     } else {
       reset({ id: '', title: '', desc: '', status: TaskStatus.TODO });
     }
   }, [taskId, tasks, reset]);
 
   const onSubmit = (data: TaskFormData) => {
-    const updatedTasks = tasks ? [...tasks] : [];
-    if (taskId) {
-      const index = updatedTasks.findIndex((task) => task.id === taskId);
+    const taskData = tasks?.find((task) => task.id === taskId);
+    let allTasks = tasks ? [...tasks] : [];
+
+    if (taskData) {
+      const index = allTasks.findIndex((task) => task.id === taskId);
       if (index !== -1) {
-        updatedTasks[index] = { ...updatedTasks[index], ...data };
-      } else {
-        console.error('Task not found');
+        allTasks[index] = { ...allTasks[index], ...data };
       }
     } else {
       const newTask: Task = { ...data, id: uuidv4() };
-      updatedTasks.push(newTask);
+      allTasks = [...allTasks, newTask];
     }
-    setTasks(updatedTasks);
+
+    setTasks(allTasks);
     navigate('/');
   };
 
