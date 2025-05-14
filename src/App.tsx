@@ -1,21 +1,9 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar/Navbar';
 import { TaskListWrapper } from './components/Task/TaskListWrapper';
 import { AddEditTaskWrapper } from './components/Task/AddEditTaskWrapper';
-
-const NotFound: React.FC = () => (
-  <div className="text-center mt-5">
-    <h2>404 - Page Not Found</h2>
-    <p>The page you're looking for doesn't exist.</p>
-    <button
-      className="btn btn-primary"
-      onClick={() => (window.location.href = '/')}
-    >
-      Go Home
-    </button>
-  </div>
-);
+import NotFound from './components/NotFound/NotFound';
 
 const App: React.FC = () => {
   return (
