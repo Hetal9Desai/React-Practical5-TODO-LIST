@@ -1,3 +1,4 @@
+
 ## Task Manager App
 
 A simple and intuitive task management app built with React and TypeScript. It allows users to create, edit, delete, and filter tasks. The app utilizes React Context for state management, Zod for form validation, and React Hook Form for form handling.
@@ -30,3 +31,6 @@ Features
 ## Deploy Link:
 
     https://cozy-mandazi-687970.netlify.app/
+
+
+
